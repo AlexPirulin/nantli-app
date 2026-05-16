@@ -13,8 +13,21 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
   final List<ChildModel> _children = [];
   final _needsController = TextEditingController();
 
-  void _addChild(ChildModel child) {
-    setState(() => _children.add(child));
+  void _addOrUpdateChild(ChildModel child) {
+    setState(() {
+      final index = _children.indexWhere((c) => c.id == child.id);
+      if (index != -1) {
+        // Actualizar hijo existente
+        _children[index] = child;
+      } else {
+        // Agregar nuevo hijo
+        _children.add(child);
+      }
+    });
+  }
+
+  void _removeChild(String id) {
+    setState(() => _children.removeWhere((c) => c.id == id));
   }
 
   @override
@@ -48,7 +61,6 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
             
             const SizedBox(height: 32),
             
-            // Sección Necesidades
             _buildSectionTitle('Necesidades Generales', Icons.info_outline_rounded, isDarkMode),
             const SizedBox(height: 12),
             TextField(
@@ -66,7 +78,6 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
             
             const SizedBox(height: 40),
             
-            // Sección Hijos
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -74,7 +85,7 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
                 IconButton(
                   onPressed: () => showDialog(
                     context: context, 
-                    builder: (context) => AddChildDialog(onAdd: _addChild)
+                    builder: (context) => AddChildDialog(onSave: _addOrUpdateChild)
                   ),
                   icon: const Icon(Icons.add_circle_outline_rounded, size: 28),
                   color: isDarkMode ? accentColor : primaryPurple,
@@ -95,13 +106,11 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
             
             const SizedBox(height: 60),
             
-            // Botón Guardar
             SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Lógica para guardar en Firestore
                   _showSavedSnackbar();
                 },
                 style: ElevatedButton.styleFrom(
@@ -122,7 +131,7 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
   Widget _buildSectionTitle(String title, IconData icon, bool isDarkMode) {
     return Row(
       children: [
-        const Icon(icon, size: 20, color: Color(0xFFD1C4E9)),
+        Icon(icon, size: 20, color: const Color(0xFFD1C4E9)),
         const SizedBox(width: 8),
         Text(
           title,
@@ -139,7 +148,7 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.white.withOpacity(0.02) : Colors.black.withOpacity(0.02),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: isDarkMode ? Colors.white10 : Colors.black12),
       ),
       child: Column(
         children: const [
@@ -181,12 +190,22 @@ class _TutorSetupScreenState extends State<TutorSetupScreen> {
               ],
             ),
           ),
+          // Botón Editar
           IconButton(
             icon: const Icon(Icons.edit_note_rounded, color: Colors.grey),
-            onPressed: () {
-              // TODO: Editar hijo
-            },
-          )
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => AddChildDialog(
+                onSave: _addOrUpdateChild,
+                initialChild: child, // Pasar datos actuales para editar
+              ),
+            ),
+          ),
+          // Botón Eliminar
+          IconButton(
+            icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+            onPressed: () => _removeChild(child.id),
+          ),
         ],
       ),
     );

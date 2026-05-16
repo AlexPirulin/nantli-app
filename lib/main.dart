@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/tutor/tutor_setup_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,7 @@ class NantliApp extends StatelessWidget {
       routes: {
         '/register': (context) => const RegisterScreen(),
         '/login': (context) => const LoginScreen(),
+        '/tutor-setup': (context) => const TutorSetupScreen(),
       },
     );
   }

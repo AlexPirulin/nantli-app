@@ -43,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        // Aquí podrías navegar al Home principal
+        // Navegar a la pantalla de configuración del Tutor
+        Navigator.pushReplacementNamed(context, '/tutor-setup');
       }
     } catch (e) {
       if (mounted) {
@@ -178,7 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('¡Bienvenido con Google!'), backgroundColor: Colors.green),
                         );
-                        Navigator.pushReplacementNamed(context, '/'); // O a tu pantalla principal
+                        // Redirigir a configuración de tutor después de Google
+                        Navigator.pushReplacementNamed(context, '/tutor-setup');
                       }
                     } catch (e) {
                       if (mounted) {

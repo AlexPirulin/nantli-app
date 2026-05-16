@@ -58,9 +58,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Icon(Icons.mark_email_read, size: 60, color: Color(0xFF2D1B4D)),
-        content: const Text('¡Registro Exitoso! Hemos enviado un correo de confirmación.', textAlign: TextAlign.center),
+        content: const Text('¡Registro Exitoso! Vamos a configurar tu perfil de Tutor.', textAlign: TextAlign.center),
         actions: [
-          TextButton(onPressed: () => Navigator.popUntil(context, (route) => route.isFirst), child: const Text('Entendido')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Cerrar diálogo
+              if (_selectedRole == UserRole.tutor) {
+                Navigator.pushReplacementNamed(context, '/tutor-setup');
+              } else {
+                // TODO: Navegar a pantalla de Cuidador cuando esté lista
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }
+            }, 
+            child: const Text('Comenzar')
+          ),
         ],
       ),
     );
@@ -157,7 +168,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('¡Inicio con Google exitoso!'), backgroundColor: Colors.green),
                         );
-                        Navigator.popUntil(context, (route) => route.isFirst);
+                        // Redirigir a configuración de tutor después de Google
+                        Navigator.pushReplacementNamed(context, '/tutor-setup');
                       }
                     } catch (e) {
                       if (mounted) {
