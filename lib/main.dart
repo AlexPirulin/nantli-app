@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/auth/login_screen.dart';
 
 void main() {
   runApp(const NantliApp());
@@ -43,6 +44,7 @@ class NantliApp extends StatelessWidget {
       home: const WelcomeScreen(),
       routes: {
         '/register': (context) => const RegisterScreen(),
+        '/login': (context) => const LoginScreen(),
       },
     );
   }
@@ -114,7 +116,7 @@ class WelcomeScreen extends StatelessWidget {
                         label: 'Iniciar Sesión',
                         isPrimary: true,
                         isDarkMode: isDarkMode,
-                        onPressed: () {},
+                        onPressed: () => Navigator.pushNamed(context, '/login'),
                       ),
                       const SizedBox(height: 16),
                       _buildButton(
