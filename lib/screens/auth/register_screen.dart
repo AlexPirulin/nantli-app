@@ -144,12 +144,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
               
               const SizedBox(height: 24),
               
-              // Botón de Google (Uso de asset local para evitar error de red)
+              // Botón de Google (Funcionalidad Real)
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    setState(() => _isLoading = true);
+                    try {
+                      await _authService.signInWithGoogle();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('¡Inicio con Google exitoso!'), backgroundColor: Colors.green),
+                        );
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error al conectar con Google'), backgroundColor: Colors.redAccent),
+                        );
+                      }
+                    } finally {
+                      if (mounted) setState(() => _isLoading = false);
+                    }
+                  },
                   icon: Image.asset(
                     'assets/images/google_logo.png',
                     height: 24,

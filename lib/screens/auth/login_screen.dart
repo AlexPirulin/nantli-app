@@ -165,12 +165,31 @@ class _LoginScreenState extends State<LoginScreen> {
               
               const SizedBox(height: 24),
               
-              // Botón de Google
+              // Botón de Google (Funcionalidad Real)
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    setState(() => _isLoading = true);
+                    try {
+                      await _authService.signInWithGoogle();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('¡Bienvenido con Google!'), backgroundColor: Colors.green),
+                        );
+                        Navigator.pushReplacementNamed(context, '/'); // O a tu pantalla principal
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error al conectar con Google'), backgroundColor: Colors.redAccent),
+                        );
+                      }
+                    } finally {
+                      if (mounted) setState(() => _isLoading = false);
+                    }
+                  },
                   icon: Image.asset('assets/images/google_logo.png', height: 24),
                   label: Text(
                     'Entrar con Google',
