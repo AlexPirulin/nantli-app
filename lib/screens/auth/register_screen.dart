@@ -66,8 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               if (_selectedRole == UserRole.tutor) {
                 Navigator.pushReplacementNamed(context, '/tutor-setup');
               } else {
-                // TODO: Navegar a pantalla de Cuidador cuando esté lista
-                Navigator.popUntil(context, (route) => route.isFirst);
+                Navigator.pushReplacementNamed(context, '/caregiver-setup');
               }
             }, 
             child: const Text('Comenzar')
@@ -168,8 +167,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('¡Inicio con Google exitoso!'), backgroundColor: Colors.green),
                         );
-                        // Redirigir a configuración de tutor después de Google
-                        Navigator.pushReplacementNamed(context, '/tutor-setup');
+                        // Redirigir según el rol seleccionado previamente
+                        if (_selectedRole == UserRole.tutor) {
+                          Navigator.pushReplacementNamed(context, '/tutor-setup');
+                        } else {
+                          Navigator.pushReplacementNamed(context, '/caregiver-setup');
+                        }
                       }
                     } catch (e) {
                       if (mounted) {
