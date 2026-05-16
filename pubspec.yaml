@@ -1,0 +1,32 @@
+name: nantli
+description: "App de servicios de niñera - Nantli"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/launcher_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#7B1FA2"
+  adaptive_icon_foreground: "assets/images/launcher_icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/logo_light.png
+    - assets/images/logo_dark.png
+    - assets/images/launcher_icon.png
