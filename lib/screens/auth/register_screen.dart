@@ -19,7 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   
   UserRole _selectedRole = UserRole.tutor;
   bool _isLoading = false;
-  final bool _obscurePassword = true;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -31,9 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       await _authService.registerUser(
         name: _nameController.text.trim(),
@@ -41,23 +39,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         role: _selectedRole,
       );
-
-      if (mounted) {
-        _showSuccessDialog();
-      }
+      if (mounted) _showSuccessDialog();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.redAccent,
-          ),
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.redAccent),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -68,29 +58,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Icon(Icons.mark_email_read, size: 60, color: Color(0xFF2D1B4D)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              '¡Registro Exitoso!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Hemos enviado un correo de confirmación a ${_emailController.text}.\n\nPor favor, verifica tu bandeja de entrada para activar tu cuenta.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.black54),
-            ),
-          ],
-        ),
+        content: const Text('¡Registro Exitoso! Hemos enviado un correo de confirmación.', textAlign: TextAlign.center),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            },
-            child: const Text('Entendido', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          ),
+          TextButton(onPressed: () => Navigator.popUntil(context, (route) => route.isFirst), child: const Text('Entendido')),
         ],
       ),
     );
@@ -100,17 +70,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
-    final titleColor = isDarkMode ? Colors.white : const Color(0xFF2D1B4D);
-    final subtitleColor = isDarkMode ? Colors.white70 : Colors.black54;
+    final textColor = isDarkMode ? Colors.white : const Color(0xFF2D1B4D);
+    final accentColor = isDarkMode ? const Color(0xFFD1C4E9) : colorScheme.primary;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: titleColor),
-          onPressed: () => Navigator.pop(context),
-        ),
+        backgroundColor: Colors.transparent, 
+        elevation: 0, 
+        leading: BackButton(color: textColor),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -120,31 +87,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Crea tu cuenta',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: titleColor,
-                  letterSpacing: -0.5,
-                ),
+                'Crea tu cuenta', 
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textColor),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Únete a la comunidad de cuidado infantil más confiable.',
-                style: TextStyle(fontSize: 16, color: subtitleColor),
-              ),
-              
               const SizedBox(height: 32),
               
-              Text(
-                '¿Quién eres?',
-                style: TextStyle(
-                  fontSize: 14, 
-                  fontWeight: FontWeight.bold, 
-                  color: isDarkMode ? Colors.white54 : Colors.black45,
-                ),
-              ),
-              const SizedBox(height: 12),
+              // Selector de Rol
               Row(
                 children: [
                   _buildRoleCard('Soy Tutor', Icons.family_restroom, UserRole.tutor, isDarkMode),
@@ -155,28 +103,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
               
               const SizedBox(height: 32),
               
-              _buildTextField(_nameController, 'Nombre Completo', Icons.person_outline, isDarkMode),
+              _buildField(_nameController, 'Nombre Completo', Icons.person_outline, isDarkMode),
               const SizedBox(height: 20),
-              _buildTextField(_emailController, 'Correo Electrónico', Icons.email_outlined, isDarkMode, keyboardType: TextInputType.emailAddress),
+              _buildField(_emailController, 'Correo Electrónico', Icons.email_outlined, isDarkMode, keyboardType: TextInputType.emailAddress),
               const SizedBox(height: 20),
-              _buildTextField(_passwordController, 'Contraseña', Icons.lock_outline, isDarkMode, isPassword: true),
+              _buildField(_passwordController, 'Contraseña', Icons.lock_outline, isDarkMode, isPassword: true),
               
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
               
+              // Botón de Registro
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleRegister,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode ? colorScheme.primary : const Color(0xFF2D1B4D),
-                    foregroundColor: isDarkMode ? Colors.black : Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    elevation: 0,
+                    backgroundColor: accentColor,
+                    foregroundColor: isDarkMode ? const Color(0xFF2D1B4D) : Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
-                  child: _isLoading
-                      ? CircularProgressIndicator(color: isDarkMode ? Colors.black : Colors.white)
+                  child: _isLoading 
+                      ? CircularProgressIndicator(color: isDarkMode ? const Color(0xFF2D1B4D) : Colors.white) 
                       : const Text('Registrarme', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Divisor
+              Row(
+                children: [
+                  Expanded(child: Divider(color: isDarkMode ? Colors.white24 : Colors.black12)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('O continuar con', style: TextStyle(color: isDarkMode ? Colors.white54 : Colors.black45)),
+                  ),
+                  Expanded(child: Divider(color: isDarkMode ? Colors.white24 : Colors.black12)),
+                ],
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Botón de Google (Uso de asset local para evitar error de red)
+              SizedBox(
+                width: double.infinity,
+                height: 60,
+                child: OutlinedButton.icon(
+                  onPressed: () {},
+                  icon: Image.asset(
+                    'assets/images/google_logo.png',
+                    height: 24,
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.g_mobiledata, size: 30),
+                  ),
+                  label: Text(
+                    'Continuar con Google',
+                    style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: isDarkMode ? Colors.white24 : Colors.black12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -189,31 +175,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildRoleCard(String label, IconData icon, UserRole role, bool isDarkMode) {
     final isSelected = _selectedRole == role;
-    final primaryColor = Theme.of(context).colorScheme.primary;
+    final accentColor = const Color(0xFFD1C4E9);
+    final primaryColor = const Color(0xFF2D1B4D);
 
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedRole = role),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected 
-                ? (isDarkMode ? primaryColor : const Color(0xFF2D1B4D)) 
-                : (isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.05)),
+                ? (isDarkMode ? accentColor : primaryColor) 
+                : (isDarkMode ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05)),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected 
-                  ? (isDarkMode ? primaryColor : const Color(0xFF2D1B4D)) 
-                  : (isDarkMode ? Colors.white.withOpacity(0.1) : Colors.grey.withOpacity(0.2)),
+              color: isSelected ? (isDarkMode ? accentColor : primaryColor) : (isDarkMode ? Colors.white10 : Colors.black12), 
               width: 2,
             ),
           ),
           child: Column(
             children: [
-              Icon(icon, color: isSelected ? (isDarkMode ? Colors.black : Colors.white) : (isDarkMode ? Colors.white54 : Colors.black45)),
+              Icon(
+                icon, 
+                color: isSelected 
+                    ? (isDarkMode ? primaryColor : Colors.white) 
+                    : (isDarkMode ? Colors.white54 : Colors.black45),
+              ),
               const SizedBox(height: 8),
-              Text(label, style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? (isDarkMode ? Colors.black : Colors.white) : (isDarkMode ? Colors.white54 : Colors.black45))),
+              Text(
+                label, 
+                style: TextStyle(
+                  color: isSelected 
+                      ? (isDarkMode ? primaryColor : Colors.white) 
+                      : (isDarkMode ? Colors.white54 : Colors.black45), 
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ),
@@ -221,8 +218,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, bool isDarkMode, {bool isPassword = false, TextInputType? keyboardType}) {
-    final primaryColor = Theme.of(context).colorScheme.primary;
+  Widget _buildField(TextEditingController controller, String label, IconData icon, bool isDarkMode, {bool isPassword = false, TextInputType? keyboardType}) {
+    final accentColor = const Color(0xFFD1C4E9);
     return TextFormField(
       controller: controller,
       obscureText: isPassword && _obscurePassword,
@@ -230,11 +227,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: isDarkMode ? primaryColor : const Color(0xFF2D1B4D)),
+        labelStyle: TextStyle(color: isDarkMode ? Colors.white54 : Colors.black45),
+        prefixIcon: Icon(icon, color: isDarkMode ? accentColor : const Color(0xFF2D1B4D)),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: isDarkMode ? Colors.white54 : Colors.black45),
+                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              )
+            : null,
         filled: true,
-        fillColor: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-        labelStyle: TextStyle(color: isDarkMode ? Colors.white60 : Colors.black45),
+        fillColor: isDarkMode ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide(color: isDarkMode ? accentColor : const Color(0xFF2D1B4D))),
       ),
     );
   }

@@ -11,31 +11,31 @@ class NantliApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const primaryPurple = Color(0xFF2D1B4D);
-    const accentPurple = Color(0xFF4A2C82);
+    const accentLavender = Color(0xFFD1C4E9);
 
     return MaterialApp(
       title: 'Nantli',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.system, // Restauramos el soporte para ambos temas
       theme: ThemeData(
         useMaterial3: true,
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryPurple,
           primary: primaryPurple,
           onPrimary: Colors.white,
-          secondary: accentPurple,
           surface: Colors.white,
         ),
         scaffoldBackgroundColor: Colors.white,
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
+        brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
           brightness: Brightness.dark,
-          seedColor: const Color(0xFFBA68C8),
-          primary: const Color(0xFFE1BEE7),
+          seedColor: accentLavender,
+          primary: accentLavender,
           onPrimary: primaryPurple,
-          secondary: const Color(0xFFCE93D8),
           surface: const Color(0xFF121212),
         ),
         scaffoldBackgroundColor: const Color(0xFF121212),
@@ -55,71 +55,65 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
-    const primaryPurple = Color(0xFF2D1B4D);
 
     return Scaffold(
       body: Stack(
         children: [
+          // Fondo dinámico (Oscuro en dark mode, blanco con degradado sutil en light mode)
           Positioned.fill(
-            child: DecoratedBox(
+            child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    colorScheme.primary.withOpacity(isDarkMode ? 0.1 : 0.05),
-                    colorScheme.surface,
-                  ],
-                  stops: const [0.0, 0.4],
-                ),
+                gradient: isDarkMode 
+                  ? const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF2D1B3D), Color(0xFF121212)],
+                    )
+                  : LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [colorScheme.primary.withOpacity(0.05), Colors.white],
+                    ),
               ),
             ),
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
               child: Column(
                 children: [
                   const Spacer(flex: 2),
-                  Hero(
-                    tag: 'logo',
-                    child: Image.asset(
-                      isDarkMode 
-                          ? 'assets/images/logo_dark.png' 
-                          : 'assets/images/logo_light.png',
-                      height: 160,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => 
-                          Icon(Icons.child_care_rounded, size: 120, color: colorScheme.primary),
-                    ),
+                  
+                  // Logo dinámico
+                  Image.asset(
+                    isDarkMode ? 'assets/images/logo_dark.png' : 'assets/images/logo_light.png',
+                    height: 180,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => 
+                        Icon(Icons.child_care_rounded, size: 120, color: colorScheme.primary),
                   ),
+                  
                   const SizedBox(height: 48),
+                  
                   Text(
-                    'Nantli',
-                    style: TextStyle(
-                      fontSize: 42,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -1,
-                      color: isDarkMode ? Colors.white : primaryPurple,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Confianza y cuidado para tus pequeños, a un solo toque de distancia.',
+                    'Confianza y cuidado para tus pequeños.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDarkMode ? Colors.white70 : Colors.black45,
-                      height: 1.6,
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                      letterSpacing: 0.5,
                     ),
                   ),
+                  
                   const Spacer(flex: 3),
+                  
                   Column(
                     children: [
                       _buildButton(
                         context,
                         label: 'Iniciar Sesión',
                         isPrimary: true,
+                        isDarkMode: isDarkMode,
                         onPressed: () {},
                       ),
                       const SizedBox(height: 16),
@@ -127,6 +121,7 @@ class WelcomeScreen extends StatelessWidget {
                         context,
                         label: 'Registrarme',
                         isPrimary: false,
+                        isDarkMode: isDarkMode,
                         onPressed: () => Navigator.pushNamed(context, '/register'),
                       ),
                     ],
@@ -141,42 +136,44 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(BuildContext context, {required String label, required bool isPrimary, required VoidCallback onPressed}) {
+  Widget _buildButton(BuildContext context, {required String label, required bool isPrimary, required bool isDarkMode, required VoidCallback onPressed}) {
     final colorScheme = Theme.of(context).colorScheme;
-    return SizedBox(
-      width: double.infinity,
-      height: 60,
-      child: isPrimary 
-        ? Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: colorScheme.primary.withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: onPressed,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              ),
-              child: Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ),
-          )
-        : OutlinedButton(
-            onPressed: onPressed,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: colorScheme.primary, width: 2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            ),
-            child: Text(label, style: TextStyle(color: colorScheme.primary, fontSize: 18, fontWeight: FontWeight.bold)),
+    
+    if (isPrimary) {
+      return SizedBox(
+        width: double.infinity,
+        height: 60,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isDarkMode ? const Color(0xFFD1C4E9) : colorScheme.primary,
+            foregroundColor: isDarkMode ? const Color(0xFF2D1B4D) : Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           ),
-    );
+          child: Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        ),
+      );
+    } else {
+      return SizedBox(
+        width: double.infinity,
+        height: 60,
+        child: OutlinedButton(
+          onPressed: onPressed,
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: isDarkMode ? Colors.white38 : colorScheme.primary, width: 1.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : colorScheme.primary,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
