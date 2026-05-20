@@ -4,7 +4,7 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/tutor/tutor_setup_screen.dart';
 import 'screens/caregiver/caregiver_setup_screen.dart';
-
+//El kevin se hizo caca y huele feo
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Inicializamos Firebase
